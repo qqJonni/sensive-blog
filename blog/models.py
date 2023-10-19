@@ -25,7 +25,7 @@ class PostQuerySet(models.QuerySet):
         most_popular_posts = self
         for post in most_popular_posts:
             post.comments_count = count_for_id[post.id]
-        return list(most_popular_posts)
+        return most_popular_posts
 
 
 class TagQuerySet(models.QuerySet):
