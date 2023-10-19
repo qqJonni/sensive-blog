@@ -10,6 +10,23 @@ class PostQuerySet(models.QuerySet):
         post_at_year = self.filter(published_at__year=year).order_by('published_at')
         return post_at_year
 
+    def popular(self):
+        """ Показывает популярные посты """
+        posts_with_likes = self.annotate(likes_count=Count('likes')).order_by('-likes_count')
+        return posts_with_likes
+
+    def fetch_with_comments_count(self):
+        """ Подгружает комментарии """
+        annotate_posts_ids = [post.id for post in self]
+        posts_with_comments = Post.objects.filter(
+            id__in=annotate_posts_ids).annotate(comments_count=Count('comments'))
+        ids_and_comments = posts_with_comments.values_list('id', 'comments_count')
+        count_for_id = dict(ids_and_comments)
+        most_popular_posts = self
+        for post in most_popular_posts:
+            post.comments_count = count_for_id[post.id]
+        return list(most_popular_posts)
+
 
 class TagQuerySet(models.QuerySet):
 
