@@ -45,7 +45,7 @@ def post_detail(request, slug):
     posts_with_likes = Post.objects.popular().prefetch_posts().prefetch_related(
         Prefetch('comments', queryset=Comment.objects.all()))
     post = get_object_or_404(posts_with_likes, slug=slug)
-    comments = Comment.objects.filter(post=post).prefetch_related('author')
+    comments = post.comments.all().prefetch_related('author')
     serialized_comments = []
     for comment in comments:
         serialized_comments.append({
